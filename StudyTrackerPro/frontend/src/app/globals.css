@@ -1,0 +1,222 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+body {
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+}
+
+@layer utilities {
+  .text-balance {
+    text-wrap: balance;
+  }
+}
+
+@layer base {
+  :root {
+    --background: 230 100% 99%;
+    --foreground: 224 71.4% 4.1%;
+    --card: 0 0% 100%;
+    --card-foreground: 224 71.4% 4.1%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 224 71.4% 4.1%;
+    --primary: 262.1 83.3% 57.8%;
+    --primary-foreground: 210 20% 98%;
+    --secondary: 220 14.3% 95.9%;
+    --secondary-foreground: 220.9 39.3% 11%;
+    --muted: 220 14.3% 95.9%;
+    --muted-foreground: 220 8.9% 46.1%;
+    --accent: 262.1 83.3% 57.8%;
+    --accent-foreground: 220.9 39.3% 11%;
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 210 20% 98%;
+    --border: 220 13% 91%;
+    --input: 220 13% 91%;
+    --ring: 262.1 83.3% 57.8%;
+    --chart-1: 262.1 83.3% 57.8%;
+    --chart-2: 291.5 95.8% 71.4%;
+    --chart-3: 199.4 95.5% 73.9%;
+    --chart-4: 43.3 96.4% 56.3%;
+    --chart-5: 168.6 83.8% 48.2%;
+    --radius: 1rem;
+  }
+
+  .dark {
+    --background: 224 71.4% 4.1%;
+    --foreground: 210 20% 98%;
+    --card: 224 71.4% 4.1%;
+    --card-foreground: 210 20% 98%;
+    --popover: 224 71.4% 4.1%;
+    --popover-foreground: 210 20% 98%;
+    --primary: 263.4 70% 50.4%;
+    --primary-foreground: 210 20% 98%;
+    --secondary: 215 27.9% 16.9%;
+    --secondary-foreground: 210 20% 98%;
+    --muted: 215 27.9% 16.9%;
+    --muted-foreground: 217.9 10.6% 64.9%;
+    --accent: 263.4 70% 50.4%;
+    --accent-foreground: 210 20% 98%;
+    --destructive: 0 62.8% 30.6%;
+    --destructive-foreground: 210 20% 98%;
+    --border: 215 27.9% 16.9%;
+    --input: 215 27.9% 16.9%;
+    --ring: 263.4 70% 50.4%;
+    --chart-1: 263.4 70% 50.4%;
+    --chart-2: 291.5 95.8% 71.4%;
+    --chart-3: 199.4 95.5% 73.9%;
+    --chart-4: 43.3 96.4% 56.3%;
+    --chart-5: 168.6 83.8% 48.2%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  body {
+    @apply bg-background text-foreground;
+    background-image:
+      radial-gradient(at 100% 100%, rgba(var(--primary) / 0.05) 0px, transparent 50%),
+      radial-gradient(at 0% 0%, rgba(var(--chart-2) / 0.05) 0px, transparent 50%);
+    background-attachment: fixed;
+  }
+}
+
+/* マークダウンエディタのスタイル */
+.w-md-editor {
+  --md-editor-bg-color: transparent !important;
+  --md-editor-text-color: hsl(var(--foreground));
+  --md-editor-border-color: hsl(var(--border));
+  --md-editor-toolbar-bg-color: hsl(var(--card));
+  --md-editor-toolbar-hover-bg-color: hsl(var(--accent));
+  --md-editor-toolbar-active-bg-color: hsl(var(--accent));
+  --md-editor-toolbar-color: hsl(var(--foreground));
+  --md-editor-toolbar-hover-color: hsl(var(--accent-foreground));
+  border-radius: var(--radius) !important;
+  overflow: hidden;
+}
+
+.w-md-editor-text-pre > code,
+.w-md-editor-text-input {
+  font-size: 16px !important;
+  line-height: 1.6 !important;
+  font-family: 'JetBrains Mono', monospace !important;
+  padding: 1rem !important;
+}
+
+.w-md-editor-toolbar {
+  border-bottom: 1px solid hsl(var(--border)) !important;
+  background-color: hsl(var(--card)) !important;
+}
+
+.w-md-editor-toolbar li > button {
+  color: hsl(var(--foreground)) !important;
+}
+
+.w-md-editor-toolbar li > button:hover {
+  background-color: hsl(var(--accent)) !important;
+  color: hsl(var(--accent-foreground)) !important;
+}
+
+/* エディタの入力領域とプレビュー領域のスタイル */
+.w-md-editor-content {
+  background-color: transparent !important;
+}
+
+.w-md-editor-text {
+  background-color: transparent !important;
+}
+
+.w-md-editor-text-pre,
+.w-md-editor-text-input {
+  color: hsl(var(--foreground)) !important;
+  -webkit-text-fill-color: hsl(var(--foreground)) !important;
+  background-color: transparent !important;
+  caret-color: hsl(var(--primary)) !important;
+}
+
+.w-md-editor-text-pre > code {
+  color: hsl(var(--foreground)) !important;
+  background-color: transparent !important;
+}
+
+.w-md-editor-preview {
+  padding: 1rem !important;
+  background-color: hsl(var(--secondary)/0.3) !important;
+  color: hsl(var(--foreground)) !important;
+}
+
+/* プレビューのスタイル */
+.wmde-markdown {
+  background-color: transparent !important;
+  font-family: inherit !important;
+  color: hsl(var(--foreground)) !important;
+}
+
+.wmde-markdown h1,
+.wmde-markdown h2,
+.wmde-markdown h3,
+.wmde-markdown h4,
+.wmde-markdown h5,
+.wmde-markdown h6 {
+  color: hsl(var(--primary)) !important;
+  border-bottom-color: hsl(var(--border)) !important;
+}
+
+.wmde-markdown code {
+  background-color: hsl(var(--secondary)) !important;
+  border-color: hsl(var(--border)) !important;
+  color: hsl(var(--foreground)) !important;
+}
+
+.wmde-markdown pre {
+  background-color: hsl(var(--secondary)) !important;
+  border-color: hsl(var(--border)) !important;
+}
+
+.wmde-markdown blockquote {
+  border-left-color: hsl(var(--primary)) !important;
+  color: hsl(var(--muted-foreground)) !important;
+}
+
+/* ダークモード対応 */
+[data-color-mode="dark"] .w-md-editor-text-pre,
+[data-color-mode="dark"] .w-md-editor-text-input,
+[data-color-mode="dark"] .w-md-editor-text-pre > code {
+  color: hsl(var(--foreground)) !important;
+  -webkit-text-fill-color: hsl(var(--foreground)) !important;
+}
+
+/* カード効果 */
+.bg-card {
+  backdrop-filter: blur(12px);
+  border: 1px solid rgba(var(--primary) / 0.1);
+  transition: all 0.2s ease-in-out;
+}
+
+.bg-card:hover {
+  transform: translateY(-2px);
+  border-color: rgba(var(--primary) / 0.2);
+  box-shadow: 0 8px 30px rgba(var(--primary) / 0.1);
+}
+
+/* ボタン効果 */
+.button, button {
+  transition: all 0.2s ease-in-out;
+}
+
+.button:hover, button:hover {
+  transform: translateY(-1px);
+}
+
+/* タグスタイル */
+.tag {
+  background: linear-gradient(135deg, hsl(var(--primary)), hsl(var(--chart-2)));
+  color: hsl(var(--primary-foreground));
+  transition: all 0.2s ease-in-out;
+}
+
+.tag:hover {
+  opacity: 0.9;
+  transform: translateY(-1px);
+}
