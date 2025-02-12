@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useCallback } from 'react'
 import { useRouter } from 'next/navigation'
 import { Button } from '@/components/ui/button'
 import { supabase } from '@/lib/supabase'
@@ -58,56 +58,7 @@ export default function Analytics() {
   const [studyDays, setStudyDays] = useState(0)
   const [maxStudyTime, setMaxStudyTime] = useState(0)
 
-  useEffect(() => {
-    const checkSession = async () => {
-      const { data: { session } } = await supabase.auth.getSession()
-      if (!session) {
-        router.push('/login')
-      }
-    }
-    checkSession()
-  }, [router])
-
-  useEffect(() => {
-    fetchEntries()
-  }, [selectedRange])
-
-  const getRangeDate = (range: TimeRange) => {
-    const now = new Date()
-    switch (range) {
-      case '1週間':
-        return new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000)
-      case '1ヶ月':
-        return new Date(now.setMonth(now.getMonth() - 1))
-      case '3ヶ月':
-        return new Date(now.setMonth(now.getMonth() - 3))
-      case '6ヶ月':
-        return new Date(now.setMonth(now.getMonth() - 6))
-      case '1年':
-        return new Date(now.setFullYear(now.getFullYear() - 1))
-    }
-  }
-
-  const fetchEntries = async () => {
-    try {
-      const rangeDate = getRangeDate(selectedRange)
-      const { data, error } = await supabase
-        .from('daily_entries')
-        .select('*')
-        .gte('created_at', rangeDate.toISOString())
-        .order('created_at', { ascending: true })
-
-      if (error) throw error
-      setEntries(data || [])
-      calculateSummary(data || [])
-    } catch (error) {
-      console.error('学習記録の取得に失敗しました:', error)
-    } finally {
-      setLoading(false)
-    }
-  }
-
-  const calculateSummary = (data: DailyEntry[]) => {
+  const calculateSummary = useCallback((data: DailyEntry[]) => {
     // タグごとの集計
     const tagMap = new Map<string, { count: number; totalTime: number }>()
     data.forEach(entry => {
@@ -164,6 +115,57 @@ export default function Analytics() {
     setStudyDays(uniqueDays)
     setAverageStudyTime(uniqueDays > 0 ? Math.round(total / uniqueDays) : 0)
     setMaxStudyTime(max)
+  }, [])
+
+  const fetchEntries = useCallback(async () => {
+    try {
+      const rangeDate = getRangeDate(selectedRange)
+      const { data, error } = await supabase
+        .from('daily_entries')
+        .select('*')
+        .gte('created_at', rangeDate.toISOString())
+        .order('created_at', { ascending: true })
+
+      if (error) throw error
+      if (data) {
+        setEntries(data)
+        calculateSummary(data)
+      }
+    } catch (error) {
+      console.error('学習記録の取得に失敗しました:', error)
+    } finally {
+      setLoading(false)
+    }
+  }, [selectedRange, calculateSummary])
+
+  useEffect(() => {
+    const checkSession = async () => {
+      const { data: { session } } = await supabase.auth.getSession()
+      if (!session) {
+        router.push('/login')
+      }
+    }
+    checkSession()
+  }, [router])
+
+  useEffect(() => {
+    fetchEntries()
+  }, [fetchEntries])
+
+  const getRangeDate = (range: TimeRange) => {
+    const now = new Date()
+    switch (range) {
+      case '1週間':
+        return new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000)
+      case '1ヶ月':
+        return new Date(now.setMonth(now.getMonth() - 1))
+      case '3ヶ月':
+        return new Date(now.setMonth(now.getMonth() - 3))
+      case '6ヶ月':
+        return new Date(now.setMonth(now.getMonth() - 6))
+      case '1年':
+        return new Date(now.setFullYear(now.getFullYear() - 1))
+    }
   }
 
   const formatStudyTime = (minutes: number) => {

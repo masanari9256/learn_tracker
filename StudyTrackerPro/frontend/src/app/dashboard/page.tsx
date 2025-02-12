@@ -1,10 +1,10 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useCallback } from 'react'
 import { useRouter } from 'next/navigation'
 import { Button } from '@/components/ui/button'
 import { supabase } from '@/lib/supabase'
-import { PenSquare, LogOut, Edit, Trash2, Clock, Tag, BarChart2, Calendar, Sparkles } from 'lucide-react'
+import { PenSquare, LogOut, Edit, Trash2, Clock, Tag as TagIcon, BarChart2, Sparkles } from 'lucide-react'
 import { marked } from 'marked'
 import {
   BarChart,
@@ -70,13 +70,7 @@ export default function Dashboard() {
     fetchEntries()
   }, [])
 
-  useEffect(() => {
-    if (entries.length > 0) {
-      calculateSummary()
-    }
-  }, [entries])
-
-  const calculateSummary = () => {
+  const calculateSummary = useCallback(() => {
     const now = new Date()
     const oneWeekAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000)
 
@@ -90,53 +84,61 @@ export default function Dashboard() {
       .reduce((sum, entry) => sum + entry.study_time, 0)
     setWeeklyStudyTime(weekly)
 
-    // タグごとの集計
-    const tagMap = new Map<string, { count: number; totalTime: number }>()
-    entries.forEach(entry => {
-      entry.tags?.forEach(tag => {
-        const current = tagMap.get(tag) || { count: 0, totalTime: 0 }
-        tagMap.set(tag, {
-          count: current.count + 1,
-          totalTime: current.totalTime + entry.study_time
+    if (entries.length > 0) {
+      // タグごとの集計
+      const tagMap = new Map<string, { count: number; totalTime: number }>()
+      entries.forEach(entry => {
+        entry.tags?.forEach(tag => {
+          const current = tagMap.get(tag) || { count: 0, totalTime: 0 }
+          tagMap.set(tag, {
+            count: current.count + 1,
+            totalTime: current.totalTime + entry.study_time
+          })
         })
       })
-    })
 
-    const summary = Array.from(tagMap.entries())
-      .map(([tag, { count, totalTime }]) => ({
-        tag,
-        count,
-        totalTime
-      }))
-      .sort((a, b) => b.totalTime - a.totalTime)
+      const summary = Array.from(tagMap.entries())
+        .map(([tag, { count, totalTime }]) => ({
+          tag,
+          count,
+          totalTime
+        }))
+        .sort((a, b) => b.totalTime - a.totalTime)
 
-    setTagSummary(summary)
+      setTagSummary(summary)
 
-    // 日別学習時間の集計
-    const dailyMap = new Map<string, number>()
-    entries
-      .filter(entry => new Date(entry.created_at) >= oneWeekAgo)
-      .forEach(entry => {
-        const date = new Date(entry.created_at).toLocaleDateString('ja-JP', {
-          month: 'short',
-          day: 'numeric'
+      // 日別学習時間の集計
+      const dailyMap = new Map<string, number>()
+      entries
+        .filter(entry => new Date(entry.created_at) >= oneWeekAgo)
+        .forEach(entry => {
+          const date = new Date(entry.created_at).toLocaleDateString('ja-JP', {
+            month: 'short',
+            day: 'numeric'
+          })
+          dailyMap.set(date, (dailyMap.get(date) || 0) + entry.study_time)
         })
-        dailyMap.set(date, (dailyMap.get(date) || 0) + entry.study_time)
-      })
 
-    const dailyData = Array.from(dailyMap.entries())
-      .map(([date, minutes]) => ({
-        date,
-        minutes
-      }))
-      .sort((a, b) => {
-        const dateA = new Date(a.date.replace('月', '/').replace('日', ''))
-        const dateB = new Date(b.date.replace('月', '/').replace('日', ''))
-        return dateA.getTime() - dateB.getTime()
-      })
+      const dailyData = Array.from(dailyMap.entries())
+        .map(([date, minutes]) => ({
+          date,
+          minutes
+        }))
+        .sort((a, b) => {
+          const dateA = new Date(a.date.replace('月', '/').replace('日', ''))
+          const dateB = new Date(b.date.replace('月', '/').replace('日', ''))
+          return dateA.getTime() - dateB.getTime()
+        })
 
-    setDailyStudyTime(dailyData)
-  }
+      setDailyStudyTime(dailyData)
+    }
+  }, [entries])
+
+  useEffect(() => {
+    if (entries.length > 0) {
+      calculateSummary()
+    }
+  }, [entries, calculateSummary])
 
   const fetchEntries = async () => {
     try {
@@ -263,7 +265,7 @@ export default function Dashboard() {
 
               <div className="bg-card rounded-2xl shadow-lg p-6 hover:shadow-xl transition-all">
                 <h2 className="text-xl font-semibold mb-6 flex items-center gap-2 bg-clip-text text-transparent bg-gradient-to-r from-primary to-[#FF8FE2]">
-                  <Tag className="w-5 h-5 text-primary" />
+                  <TagIcon className="w-5 h-5 text-primary" />
                   タグ分析
                 </h2>
                 <div className="space-y-3">
